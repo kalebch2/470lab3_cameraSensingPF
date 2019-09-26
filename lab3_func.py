@@ -16,25 +16,20 @@ def blob_search_init():
 	# Filter by Color 
 	params.filterByColor = False
 
-
 	# Filter by Area.
-	params.filterByArea = False    
-
+	params.filterByArea = True
+	params.minArea = 25
+	params.maxArea = 100
 
 	# Filter by Circularity
-	params.filterByCircularity = False
+	params.filterByCircularity = True
+	params.minCircularity = .9
 
-
-	# Filter by Inerita
+	# Filter by Inertia
 	params.filterByInertia = False
-
 
 	# Filter by Convexity
 	params.filterByConvexity = False
-
-
-	# Any other params to set???
-
 
 	################## Your Code End Here ##################
 
@@ -52,13 +47,12 @@ def blob_search(image, detector):
 	# Convert the color image into the HSV color space
 	hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
-
 	############################ Your Code Start Here ############################
 
 	# Find lower & upper for orange
 	
-	lower =(110,50,50)      # blue lower
-	upper = (130,255,255)   # blue upper
+	lower =(10,220,80)      # Orange lower
+	upper = (20,255,255)   # Orange upper
 
 	############################# Your Code End Here #############################
 
@@ -79,8 +73,11 @@ def blob_search(image, detector):
 
 	# Call opencv simpleBlobDetector functions here to find centroid of all large enough blobs in 
 	# crop_image. Make sure to add crop_top_row and crop_top_col to the centroid row and column found
-
 	# Make sure this blob center is in the full image pixels not the cropped image pixels
+
+	keypoints = detector.detect(hsv_image)
+	hsv_keypoints = cv2.drawKeypoints(image, keypoints, np.array([]), (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
 
 
 
