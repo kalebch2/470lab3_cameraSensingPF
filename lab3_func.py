@@ -12,24 +12,29 @@ def blob_search_init():
 	params = cv2.SimpleBlobDetector_Params()
 
 	################# Your Code Start Here #################
-
-	# Filter by Color 
-	params.filterByColor = False
+	# Filter by Color
+	params.filterByColor = True
+	params.blobColor = 255
 
 	# Filter by Area.
 	params.filterByArea = True
-	params.minArea = 25
-	params.maxArea = 100
+	params.minArea = 50
+	params.maxArea = 400
 
 	# Filter by Circularity
 	params.filterByCircularity = True
-	params.minCircularity = .9
+	params.minCircularity = 0.3
+	params.maxCircularity = 1.0
 
 	# Filter by Inertia
-	params.filterByInertia = False
+	params.filterByInertia = True
+	params.minInertiaRatio = 0.1
+	params.maxInertiaRatio = 1.0
 
 	# Filter by Convexity
-	params.filterByConvexity = False
+	params.filterByConvexity = True
+	params.minConvexity = 0.1
+	params.maxConvexity = 1.0
 
 	################## Your Code End Here ##################
 
@@ -67,38 +72,32 @@ def blob_search(image, detector):
 
 	crop_image = mask_image[crop_top_row:crop_bottom_row, crop_top_col:crop_bottom_col]
 
-	blob_image_center = []
-
 	############################ Your Code Start Here ############################
 
 	# Call opencv simpleBlobDetector functions here to find centroid of all large enough blobs in 
 	# crop_image. Make sure to add crop_top_row and crop_top_col to the centroid row and column found
 	# Make sure this blob center is in the full image pixels not the cropped image pixels
 
-	keypoints = detector.detect(hsv_image)
-	hsv_keypoints = cv2.drawKeypoints(image, keypoints, np.array([]), (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+	keypoints = detector.detect(mask_image)
+	image = cv2.drawKeypoints(image, keypoints, np.array([]), (0, 255, 0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-
-
-
-
-
-	# Draw centers on each blob, append all the centers to blob_image_center as string in format "x y"
-
-
-
-
-		
+	blob_image_center = []
+	for k in keypoints:
+		x = int(k.pt[0])
+		y = int(k.pt[1])
+		blob_image_center.append(str(x)+' '+str(y))
+		image = cv2.circle(image, (x,y), 1, (0,255,0), -1)
+	
 
 	############################# Your Code End Here #############################
 
 	# Draw small circle at pixel coordinate crop_top_col, crop_top_row so you can move a color
 	# under that pixel location and see what the HSV values are for that color. 
 	image = cv2.circle(image, (int(crop_top_col), int(crop_top_row)), 3, (0, 0, 255), -1)
-	print('H,S,V at pixel ' + str(crop_top_row) + ' ' + str(crop_top_col) + ' ' + str(hsv_image[crop_top_row,crop_top_col]))	
+	#print('H,S,V at pixel ' + str(crop_top_row) + ' ' + str(crop_top_col) + ' ' + str(hsv_image[crop_top_row,crop_top_col]))	
 
 	cv2.namedWindow("Maze Window")
-	cv2.imshow("Maze Window", im_with_keypoints)
+	cv2.imshow("Maze Window", image)
 
 	cv2.namedWindow("MaskImage Window")
 	cv2.imshow("MaskImage Window", mask_image)
