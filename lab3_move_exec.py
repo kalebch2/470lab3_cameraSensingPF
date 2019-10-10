@@ -646,7 +646,8 @@ class particleFilter:
         ###################################################################
         # Student finish the code below
 
-
+        self.particles = None
+        self.weights = None
 
 
 
