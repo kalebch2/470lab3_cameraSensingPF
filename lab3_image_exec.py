@@ -16,10 +16,13 @@ from lab3_func import blob_search_init, blob_search
 ######################## Replace values below in Part2 of Lab3 ########################
 
 # Params for camera calibration
-theta = 0 
-beta = 0
-tx = 0
-ty = 0
+
+Or = 480/2 
+Oc = 640/2
+theta = 0
+beta = 740
+tx =-0.2564189
+ty =-0.05439189
 
 #######################################################################################
 
@@ -45,6 +48,8 @@ class ImageConverter:
 		global beta
 		global tx
 		global ty
+		global Or
+		global Oc
 
 		try:
 		    # Convert ROS image to OpenCV image
@@ -72,17 +77,13 @@ class ImageConverter:
 			################################ Your Code Start Here ################################
 
 			# Given theta, beta, tx, ty, calculate the world coordinate of x,y namely xw, yw  
-
-
-
-
-
-
+			xw = (y - Oc)/beta - tx
+			yw = (x - Or)/beta - ty
 
 			################################# Your Code End Here ################################# 
 
 			xy_w = str(xw) + str(' ') + str(yw)
-			# print(xy_w)
+			print(xy_w)
 			self.coord_pub.publish(xy_w)
 
 

@@ -12,13 +12,14 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 from lab3_func import blob_search_init, blob_search
 
-#Or = 480/2 Oc = 640/2
-#75/0.1 = B
+
 # Params for camera calibration
 theta = 0 
 beta = 0
 tx = 0
 ty = 0
+Or = 480/2 
+Oc = 640/2
 
 class ImageConverter:
 
@@ -72,19 +73,16 @@ class ImageConverter:
             ################################# Your Code Start Here ################################# 
 
             # Calculate beta, tx and ty, given x1, y1, x2, y2
-
-            beta = 750 #75/0.1
-
-
-
-
-
-
-
-
-
-
-
+            theta = 0
+            beta = abs(x1-x2)/0.1
+            if(x1 < x2):
+            	c = x1
+            	r = y1
+            else:
+            	c = x2
+            	r = y2
+            tx = (r-Or)/beta - xw
+            ty = (c-Oc)/beta - yw
 
             ################################## Your Code End Here ################################## 
 
