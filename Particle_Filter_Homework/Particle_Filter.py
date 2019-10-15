@@ -310,9 +310,8 @@ class default_2D_Model:
 
     def readingMap(self, position): 
         """
-        Input a postion: [x, y]
+        Input a position: [x, y]
         Return the map reading, the distances to the closest wall on four directions at this position, [d1, d2, d3, d4]
-        
         """
         validPosition = [0,0]
         for i in range(2):
@@ -325,7 +324,7 @@ class default_2D_Model:
 
     def readingSensor(self):
         """
-        Return the tobot's sensor reading, the distances to the closest walls on four directions, [d1, d2, d3, d4]
+        Return the robot's sensor reading, the distances to the closest walls on four directions, [d1, d2, d3, d4]
         """
         # (down, right, up, left)
         reading = self.map.distance_to_walls((self.x, self.y))
@@ -466,13 +465,14 @@ class particleFilter:
         self.particles = []
         self.weights = []
 
-        x = np.random.uniform(0, 1, numParticles)
-        y = np.random.uniform(0, 1, numParticles)
+        normalX = np.random.uniform(0, 1, numParticles)
+        normalY = np.random.uniform(0, 1, numParticles)
 
-        for i in range(numParticles):
-            self.weights.append(1/numParticles)
-            self.particles.append()
-
+        for i in range(self.numParticles):
+            x = normalX[i] * self.curMax[0]
+            y = normalY[i] * self.curMax[1]
+            self.particles.append([x,y])
+            self.weights.append(1 / numParticles)
 
         ################################### End ###################################
 
@@ -487,10 +487,9 @@ class particleFilter:
 
         ##########################################################################
         ## Your Code start from here
-
-        for i in self.particles:
-            self.particles[i] = self.model.simulateNextPosition(self, self.particles, u_t)
-
+        for i in range(self.numParticles):
+            x = self.particles[i]
+            self.particles[i] = self.model.simulateNextPosition(x, u_t)
         ################################### End ###################################
     
     def Measurement_Model(self):
@@ -513,8 +512,20 @@ class particleFilter:
         # Update self.weights
         
         ## Your Code start from here
-        self.weights
+        rr = []
+        pr = []
 
+        rr = self.model.readingSensor()
+
+        for i in range(self.numParticles):
+            x = self.particles[i][0]
+            y = self.particles[i][1]
+            pr = self.model.readingMap([x,y])
+            distance = np.linalg.norm(np.array(rr) - np.array(pr))
+            self.weights[i] = np.exp(-distance**2/(2*self.std))
+
+        self.weights = list(np.asarray(self.weights) + 1.e-100)
+        self.weights /= sum(self.weights)
         ################################### End ###################################
     
     
@@ -529,10 +540,26 @@ class particleFilter:
         
         ## Your Code start from here
 
-        estimatePostition = []
+        estimatePosition = []
 
-        for i in self.weights
-        
+        for i in range(self.numParticles):
+            self.particles[i] += self.weights[i]
+
+        x = sum(self.particles[0]) / len(self.particles)
+        y = sum(self.particles[1]) / len(self.particles)
+
+        if x > self.curMax[0]:
+            x = self.curMax[0]
+        elif x < self.curMin[0]:
+            x = self.curMin[0]
+
+        if y > self.curMax[1]:
+            y = self.curMax[1]
+        elif y < self.curMin[1]:
+            y = self.curMin[1]
+
+        estimatePosition = [x,y]
+
         return estimatePosition
 
         ################################### End ###################################
