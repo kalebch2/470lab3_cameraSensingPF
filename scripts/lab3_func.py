@@ -65,10 +65,10 @@ def blob_search(image, detector):
 	# Define a mask using the lower and upper bounds of the orange color 
 	mask_image = cv2.inRange(hsv_image, lower, upper)
 
-	crop_top_row = 165
+	crop_top_row = 155
 	crop_bottom_row = 350
-	crop_top_col = 215
-	crop_bottom_col = 515
+	crop_top_col = 185
+	crop_bottom_col = 490
 
 	crop_image = mask_image[crop_top_row:crop_bottom_row, crop_top_col:crop_bottom_col]
 
@@ -80,15 +80,15 @@ def blob_search(image, detector):
 
 	keypoints = detector.detect(crop_image)
 
-	
 	blob_image_center = []
+
 	for k in keypoints:
 		x = int(k.pt[0]) + crop_top_col
 		y = int(k.pt[1]) + crop_top_row
 		k.pt = tuple([x,y])
 
-
 		blob_image_center.append(str(x)+' '+str(y))
+
 		image = cv2.circle(image, (x,y), 1, (0,255,0), -1)
 	image = cv2.drawKeypoints(image, keypoints, np.array([]), (0, 255, 0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
@@ -98,7 +98,7 @@ def blob_search(image, detector):
 	# Draw small circle at pixel coordinate crop_top_col, crop_top_row so you can move a color
 	# under that pixel location and see what the HSV values are for that color. 
 	image = cv2.circle(image, (int(crop_top_col), int(crop_top_row)), 3, (0, 0, 255), -1)
-	print('H,S,V at pixel ' + str(crop_top_row) + ' ' + str(crop_top_col) + ' ' + str(hsv_image[crop_top_row,crop_top_col]))	
+	#print('H,S,V at pixel ' + str(crop_top_row) + ' ' + str(crop_top_col) + ' ' + str(hsv_image[crop_top_row,crop_top_col]))	
 
 	cv2.namedWindow("Maze Window")
 	cv2.imshow("Maze Window", image)

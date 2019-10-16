@@ -191,8 +191,8 @@ blob_center = None
 startgridx = 0  # 0 to 15
 startgridy = 0  # 0 to 9
 
-gridzero_inRobotWorld_x = 0.3875
-gridzero_inRobotWorld_y = -0.0405
+gridzero_inRobotWorld_x = 0.3905
+gridzero_inRobotWorld_y = -0.0335
 
 # initialize the location of end-effector
 new_pos = [gridzero_inRobotWorld_x, gridzero_inRobotWorld_y, 0.035, -45]
@@ -418,7 +418,7 @@ class Maze(object):
 		turtle.update()
 
 	def show_estimated_location(self, estimate):
-		y_estimate, x_estimate, heading_estimate= estimate[0], estimate[1], 0
+		y_estimate, x_estimate, heading_estimate = estimate[0], estimate[1], 0
 		turtle.color('orange')
 		turtle.setposition((x_estimate, y_estimate))
 		turtle.setheading(90 - heading_estimate)
@@ -645,18 +645,16 @@ class particleFilter:
         
         ###################################################################
         # Student finish the code below
+		self.particles = []
+		self.weights = []
 
-
-
-
-
-
-
-
-
+		for i in range(self.numParticles):
+			x = np.random.uniform(0, 1) * self.curMax[0]
+			y = np.random.uniform(0, 1) * self.curMax[1]
+			self.particles.append([x,y])
+			self.weights.append(1 / numParticles)
 
 		###################################################################
-
 
 	def Sample_Motion_Model(self, u_t=0):
 
@@ -668,18 +666,11 @@ class particleFilter:
         # Update self.particles
         
         ###################################################################
-         # Student finish the code below
-
-
-
-
-
-
-
-
+        # Student finish the code below
+ 		for i in range(self.numParticles):
+ 			self.particles[i] = self.model.simulateNextPosition(self.particles[i], u_t)
 
 		####################################################################
-
 
 	def Measurement_Model(self, x, y):
 
@@ -703,25 +694,25 @@ class particleFilter:
         
         ####################################################################
         # Student finish the code below
+		rr = []
+		pr = []
 
+		rr = self.model.readingSensor(x, y)
+		
+		for i in range(self.numParticles):
+			p = self.particles[i][0]
+			q = self.particles[i][1]
+			pr = self.model.readingMap([p,q])
 
+			distance = np.sqrt((rr[0]-pr[0])**2 + (rr[1]-pr[1])**2 + 
+								(rr[2]-pr[2])**2 + (rr[3]-pr[3])**2)
 
+			self.weights[i] = np.exp(-(distance**2)/(2*self.std))
+			
 
-
-
-
-
-
-
-
-
-
-
-
+		self.weights /= sum(self.weights) + 0.000000000000000000000000000001
 
         ####################################################################
-
-
 
 	def calcPosition(self):
 
@@ -733,24 +724,28 @@ class particleFilter:
         # boundary, use self.curMin, self.curMax to check
 
         ####################################################################
-        # Student finish teh code below
+        # Student finish the code below
+		estimatePosition = []
+		x = 0
+		y = 0
 
+		for i in range(self.numParticles):
+			x += (self.particles[i][0] * self.weights[i])
+			y += (self.particles[i][1] * self.weights[i])	
 
+		if x > self.curMax[0]:
+			x = self.curMax[0]
+		elif x < self.curMin[0]:
+			x = self.curMin[0]
 
+		if y > self.curMax[1]:
+			y = self.curMax[1]
+		elif y < self.curMin[1]:
+			y = self.curMin[1]
 
+		estimatePosition = [x,y]
 
-
-
-
-
-
-
-
-
-
-        ####################################################################
-
-
+		return estimatePosition
 
 
 	def resampling(self):
